@@ -1,5 +1,5 @@
 import { Refine, WelcomePage } from "@refinedev/core";
-import { DevtoolsProvider } from "@refinedev/devtools";
+import { DevtoolsPanel, DevtoolsProvider } from "@refinedev/devtools";
 import { RefineKbar, RefineKbarProvider } from "@refinedev/kbar";
 
 import routerProvider, {
@@ -72,6 +72,7 @@ function App() {
               <UnsavedChangesNotifier />
               <DocumentTitleHandler />
             </Refine>
+            <DevtoolsPanel />
           </DevtoolsProvider>
         </ThemeProvider>
       </RefineKbarProvider>

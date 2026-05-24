@@ -2,6 +2,7 @@ import { CreateButton } from "@/components/refine-ui/buttons/create";
 import { DataTable } from "@/components/refine-ui/data-table/data-table";
 import { Breadcrumb } from "@/components/refine-ui/layout/breadcrumb";
 import { ListView } from "@/components/refine-ui/views/list-view";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -9,15 +10,37 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DEPARTMENT, DEPARTMENT_OPTIONS } from "@/constants";
+import { DEPARTMENT_OPTIONS } from "@/constants";
 import { Subject } from "@/types";
 import { useTable } from "@refinedev/react-table";
-import { Badge, Filter, Search } from "lucide-react";
+import { Filter, Search } from "lucide-react";
 import React, { useMemo, useState } from "react";
+import { Badge } from "@/components/ui/badge";
 
 const SubjectList = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("all");
+
+  const departmentFilter =
+    selectedDepartment === "all"
+      ? []
+      : [
+          {
+            field: "name",
+            operator: "eq" as const,
+            value: selectedDepartment,
+          },
+        ];
+
+  const searchFilter = searchQuery
+    ? [
+        {
+          field: "name",
+          operator: "contains" as const,
+          value: searchQuery,
+        },
+      ]
+    : [];
 
   const subjectTable = useTable<Subject>({
     columns: useMemo(
@@ -29,6 +52,38 @@ const SubjectList = () => {
           header: () => <p className="column-title ml-2">Code</p>,
           cell: ({ getValue }) => <Badge>{String(getValue())}</Badge>,
         },
+        {
+          id: "name",
+          accessorKey: "name",
+          size: 200,
+          header: () => <p className="column-title">Name</p>,
+          cell: ({ getValue }) => (
+            <span className="text-foreground">{String(getValue())}</span>
+          ),
+          filterFn: "includesString",
+        },
+        {
+          id: "department",
+          accessorKey: "department",
+          size: 150,
+          header: () => <p className="column-title">Department</p>,
+
+          cell: ({ getValue }) => (
+            <Badge variant="secondary">{String(getValue())}</Badge>
+          ),
+          filterFn: "includesString",
+        },
+        {
+          id: "description",
+          accessorKey: "description",
+          size: 200,
+          header: () => <p className="column-title">Description</p>,
+
+          cell: ({ getValue }) => (
+            <span className="truncated line-clamp-2">{String(getValue())}</span>
+          ),
+          filterFn: "includesString",
+        },
       ],
       [],
     ),
@@ -38,8 +93,12 @@ const SubjectList = () => {
         pageSize: 10,
         mode: "server",
       },
-      filters: {},
-      sorters: {},
+      filters: {
+        permanent: [...departmentFilter, ...searchFilter],
+      },
+      sorters: {
+        initial: [{ field: "id", order: "desc" }],
+      },
     },
   });
 
