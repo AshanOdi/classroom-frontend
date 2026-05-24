@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { DEPARTMENT, DEPARTMENT_OPTIONS } from "@/constants";
 import { Subject } from "@/types";
-import { useTable } from "@refinedev/core";
+import { useTable } from "@refinedev/react-table";
 import { Badge, Filter, Search } from "lucide-react";
 import React, { useMemo, useState } from "react";
 
@@ -20,27 +20,29 @@ const SubjectList = () => {
   const [selectedDepartment, setSelectedDepartment] = useState("all");
 
   const subjectTable = useTable<Subject>({
-    resource: "subjects",
-    pagination: {
-      pageSize: 10,
-      mode: "server",
+    columns: useMemo(
+      () => [
+        {
+          id: "code",
+          accessorKey: "code",
+          size: 100,
+          header: () => <p className="column-title ml-2">Code</p>,
+          cell: ({ getValue }) => <Badge>{String(getValue())}</Badge>,
+        },
+      ],
+      [],
+    ),
+    refineCoreProps: {
+      resource: "subjects",
+      pagination: {
+        pageSize: 10,
+        mode: "server",
+      },
+      filters: {},
+      sorters: {},
     },
-    filters: {},
-    sorters: {},
   });
 
-  const columns = useMemo(
-    () => [
-      {
-        id: "code",
-        accessorKey: "code",
-        size: 100,
-        header: () => <p className="column-title ml-2">Code</p>,
-        cell: ({ getValue }) => <Badge>{getValue<string>()}</Badge>,
-      },
-    ],
-    [],
-  );
   console.log(subjectTable);
 
   return (
@@ -99,7 +101,7 @@ const SubjectList = () => {
         </div>
       </div>
 
-      <DataTable column={columns} table={subjectTable} />
+      <DataTable table={subjectTable} />
     </ListView>
   );
 };
